@@ -63,7 +63,8 @@ app.get( '/', async ( req, res ) => {
 
 	let jsonOutput = JSON.stringify( data );
 	res.send( jsonOutput );
-	  
+
+  console.log( 'Completed', jsonOutput );
   await chrome.kill();
 } );
 
