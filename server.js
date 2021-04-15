@@ -18,10 +18,28 @@ app.get( '/', async ( req, res ) => {
 		res.send( 'No domain passed on.' );
 	}
 
-	const chrome       = await chromeLauncher.launch({chromeFlags: ['--headless'], onlyCategories: ['performance'] });
-	const options      = {logLevel: 'info', output: 'html', onlyCategories: ['performance'], port: chrome.port};
-	const runnerResult = await lighthouse( target, options );
-    let data           = {
+	const chrome   = await chromeLauncher.launch( { 
+    chromeFlags: ['--headless']
+  } );
+	const options  = {
+    logLevel: 'info', 
+    output: 'html', 
+    onlyCategories: ['performance'], 
+    port: chrome.port
+  };
+  const config   = {
+    extends: 'lighthouse:default',
+    settings: {
+      onlyAudits: [
+        'first-contentful-paint',
+        'largest-contentful-paint',
+        'max-potential-fid',
+        'cumulative-layout-shift',
+      ],
+    },
+  };
+	const runnerResult = await lighthouse( target, options, config );
+    let data         = {
       fcp : {
         score: runnerResult.lhr.audits['first-contentful-paint'].score,
         display: runnerResult.lhr.audits['first-contentful-paint'].displayValue,
@@ -44,7 +62,7 @@ app.get( '/', async ( req, res ) => {
 	let jsonOutput = JSON.stringify( data );
 	res.send( jsonOutput );
 	  
-  	await chrome.kill();
+  await chrome.kill();
 } );
 
 // listen for requests :)
