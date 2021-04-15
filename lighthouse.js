@@ -86,7 +86,7 @@ let demos = [
   'app',
 ];
 (async () => {
-  const chrome       = await chromeLauncher.launch( { chromeFlags: ['--headless'] }) ;
+  const chrome       = await chromeLauncher.launch( { chromeFlags: ['--headless'] } );
   const options      = {
     logLevel: 'silent', 
     output: 'json', 
