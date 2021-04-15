@@ -12,6 +12,8 @@ const lighthouse     = require('lighthouse');
 const chromeLauncher = require('chrome-launcher');
 
 app.get( '/', async ( req, res ) => {
+  req.connection.setTimeout( 60 * 10 * 1000 );
+
 	let target = req.headers.referer;
 
 	if ( ! target || '' === target ) {
@@ -69,3 +71,7 @@ app.get( '/', async ( req, res ) => {
 var listener = app.listen( process.env.PORT, function() {
   console.log( 'Your app is listening on port ' + listener.address().port );
 } );
+
+listener.on( 'connection', function( socket ) {
+    socket.setTimeout( 600 * 60 * 1000 );
+});
