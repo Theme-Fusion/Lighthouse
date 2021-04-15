@@ -12,7 +12,7 @@
     "lighthouse": "^7.3.0"
   },
   "engines": {
-    "node": "8.x"
+    "node": "14.x"
   },
   "license": "MIT",
   "keywords": [
