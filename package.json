@@ -1,0 +1,23 @@
+{
+  "name": "avada-lighthouse",
+  "version": "0.0.1",
+  "description": "Lighthouse tests for Avada prebuilts.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "chrome-launcher": "^0.13.4",
+    "express": "^4.17.1",
+    "lighthouse": "^7.3.0"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "glitch",
+    "express"
+  ]
+}
