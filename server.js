@@ -27,7 +27,7 @@ app.get( '/', async ( req, res ) => {
   console.log( 'Returning request' );
   const chrome = await chromeLauncher.launch( { 
     chromeFlags: ['--headless']
-  } );
+  } ).catch( error => { console.error( 'Chrome failed...', error ); } );
   console.log( 'Launched Chrome' );
   const options = {
     logLevel: 'info', 
@@ -78,7 +78,7 @@ app.get( '/', async ( req, res ) => {
   } );
 
   await chrome.kill();
-} );
+} ).catch( error => { console.error( 'Something bad happend...', error ); } );
 
 // listen for requests :)
 let port = process.env.PORT;
