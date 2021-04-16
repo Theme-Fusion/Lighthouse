@@ -1,1 +1,2 @@
-runtime: nodejs14 # or another supported version
+runtime: custom
+env: flex
