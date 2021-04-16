@@ -14,10 +14,11 @@ const axios          = require( 'axios' );
 
 app.get( '/', async ( req, res ) => {
   let target         = req.headers.referer;
-  let responseTarget = req.headers.response_target;
-  let demoName       = req.headers.demo_name;
-  console.log( req.headers );
-  console.log( req );
+  let responseTarget = req.query.response;
+  let demoName       = req.query.demo;
+  console.log( target );
+  console.log( responseTarget );
+  console.log( demoName );
   if ( ! target || '' === target || ! responseTarget || '' === responseTarget ) {
     console.log( 'Missing info' );
     res.status( 403 ).send( 'No domain passed on.' );
