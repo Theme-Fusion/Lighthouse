@@ -1,60 +1,55 @@
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# NOTE: DO *NOT* EDIT THIS FILE.  IT IS GENERATED.
-# PLEASE UPDATE Dockerfile.txt INSTEAD OF THIS FILE
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-FROM selenium/node-base:4.0.0-beta-3-prerelease-20210402
-LABEL authors=SeleniumHQ
+FROM browserless/base:1.9.0
 
-USER root
+# Build Args
+ARG USE_CHROME_STABLE
+ARG PUPPETEER_CHROMIUM_REVISION
+ARG PUPPETEER_VERSION
 
-#============================================
-# Google Chrome
-#============================================
-# can specify versions by CHROME_VERSION;
-#  e.g. google-chrome-stable=53.0.2785.101-1
-#       google-chrome-beta=53.0.2785.92-1
-#       google-chrome-unstable=54.0.2840.14-1
-#       latest (equivalent to google-chrome-stable)
-#       google-chrome-beta  (pull latest beta)
-#============================================
-ARG CHROME_VERSION="google-chrome-stable"
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-  && apt-get update -qqy \
-  && apt-get -qqy install \
-    ${CHROME_VERSION:-google-chrome-stable} \
-  && rm /etc/apt/sources.list.d/google-chrome.list \
-  && rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+# Application parameters and variables
+ENV APP_DIR=/usr/src/app
+ENV CONNECTION_TIMEOUT=60000
+ENV CHROME_PATH=/usr/bin/google-chrome
+ENV HOST=0.0.0.0
+ENV IS_DOCKER=true
+ENV LANG="C.UTF-8"
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV PUPPETEER_CHROMIUM_REVISION=${PUPPETEER_CHROMIUM_REVISION}
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV USE_CHROME_STABLE=${USE_CHROME_STABLE}
+ENV WORKSPACE_DIR=$APP_DIR/workspace
 
-#=================================
-# Chrome Launch Script Wrapper
-#=================================
-COPY wrap_chrome_binary /opt/bin/wrap_chrome_binary
-RUN /opt/bin/wrap_chrome_binary
+RUN mkdir -p $APP_DIR $WORKSPACE_DIR
 
-USER 1200
+WORKDIR $APP_DIR
 
-#============================================
-# Chrome webdriver
-#============================================
-# can specify versions by CHROME_DRIVER_VERSION
-# Latest released version will be used by default
-#============================================
-ARG CHROME_DRIVER_VERSION
-RUN if [ -z "$CHROME_DRIVER_VERSION" ]; \
-  then CHROME_MAJOR_VERSION=$(google-chrome --version | sed -E "s/.* ([0-9]+)(\.[0-9]+){3}.*/\1/") \
-    && CHROME_DRIVER_VERSION=$(wget --no-verbose -O - "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR_VERSION}"); \
-  fi \
-  && echo "Using chromedriver version: "$CHROME_DRIVER_VERSION \
-  && wget --no-verbose -O /tmp/chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
-  && rm -rf /opt/selenium/chromedriver \
-  && unzip /tmp/chromedriver_linux64.zip -d /opt/selenium \
-  && rm /tmp/chromedriver_linux64.zip \
-  && mv /opt/selenium/chromedriver /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
-  && chmod 755 /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION \
-  && sudo ln -fs /opt/selenium/chromedriver-$CHROME_DRIVER_VERSION /usr/bin/chromedriver
+# Install app dependencies
+COPY package.json .
+COPY tsconfig.json .
+COPY . .
 
-# expose 8080 so we can connect to it
+# Install Chrome Stable when specified
+RUN if [ "$USE_CHROME_STABLE" = "true" ]; then \
+    cd /tmp &&\
+    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
+    dpkg -i google-chrome-stable_current_amd64.deb;\
+  fi
+
+# Build and install external binaries + assets
+RUN if [ "$USE_CHROME_STABLE" = "true" ]; then \
+    export CHROMEDRIVER_SKIP_DOWNLOAD=false;\
+  else \
+    export CHROMEDRIVER_SKIP_DOWNLOAD=true;\
+  fi &&\
+  npm i puppeteer@$PUPPETEER_VERSION;\
+  npm run postinstall &&\
+  npm run build &&\
+  chown -R blessuser:blessuser $APP_DIR
+
+# Run everything after as non-privileged user.
+USER blessuser
+
+# Expose the web-socket and HTTP ports
 EXPOSE 8080
 
 ENV NODE_ENV=production
