@@ -52,6 +52,7 @@ app.get( '/', async ( req, res ) => {
     },
   };
 
+  console.log( 'Testing', target );
   const runnerResult = await lighthouse( target, options, config ).catch( error => { console.error( 'Lighthouse failed...', error ); } );
   console.log( 'Got Results' );
   let data = {
