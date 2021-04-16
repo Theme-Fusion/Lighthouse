@@ -78,7 +78,7 @@ app.get( '/', async ( req, res ) => {
   } );
 
   await chrome.kill();
-} ).catch( error => { console.error( 'Something bad happend...', error ); } );
+} );
 
 // listen for requests :)
 let port = process.env.PORT;
