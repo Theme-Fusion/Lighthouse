@@ -33,6 +33,12 @@ app.get( '/', async ( req, res ) => {
     logLevel: 'info', 
     output: 'html', 
     onlyCategories: ['performance'], 
+    onlyAudits: [
+      'first-contentful-paint',
+      'largest-contentful-paint',
+      'max-potential-fid',
+      'cumulative-layout-shift',
+    ],
     port: chrome.port
   };
 
