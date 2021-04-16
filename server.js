@@ -31,8 +31,6 @@ app.get( '/', async ( req, res ) => {
   console.log( 'Launched Chrome' );
   const options = {
     logLevel: 'info', 
-    output: 'html', 
-    onlyCategories: ['performance'], 
     onlyAudits: [
       'first-contentful-paint',
       'largest-contentful-paint',
