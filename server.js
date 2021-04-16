@@ -18,16 +18,17 @@ app.get( '/', async ( req, res ) => {
   let demoName       = req.headers.demo_name;
 
   if ( ! target || '' === target || ! responseTarget || '' === responseTarget ) {
+    console.log( 'Missing info' );
     res.status( 403 ).send( 'No domain passed on.' );
     return;
   }
 
   res.send( 'Domain is being analysed.' );
-
+  console.log( 'Returning request' );
   const chrome = await chromeLauncher.launch( { 
     chromeFlags: ['--headless']
   } );
-
+  console.log( 'Launched Chrome' );
   const options = {
     logLevel: 'info', 
     output: 'html', 
@@ -48,7 +49,7 @@ app.get( '/', async ( req, res ) => {
   };
 
   const runnerResult = await lighthouse( target, options, config );
-
+  console.log( 'Got Results' );
   let data = {
     fcp : {
       score: runnerResult.lhr.audits['first-contentful-paint'].score,
@@ -69,7 +70,7 @@ app.get( '/', async ( req, res ) => {
     score: runnerResult.lhr.categories.performance.score,
     demo_name: demoName,
   }
-
+  console.log( 'Posting Back' );
   axios.post( responseTarget, data ).then( ( res ) => {
     console.log( res )
   } ).catch( ( error ) => {
