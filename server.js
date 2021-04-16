@@ -54,7 +54,7 @@ app.get( '/', async ( req, res ) => {
 
   console.log( 'Testing URL: ', target );
   const runnerResult = await lighthouse( target, options, config ).catch( error => { console.error( 'Lighthouse failed...', error ); } );
-  console.log( 'Got Results' );
+  console.log( 'Got Results For URL' );
   let data = {
     fcp : {
       score: runnerResult.lhr.audits['first-contentful-paint'].score,
