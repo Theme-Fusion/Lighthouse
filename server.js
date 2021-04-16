@@ -16,7 +16,7 @@ app.get( '/', async ( req, res ) => {
   let target         = req.headers.referer;
   let responseTarget = req.headers.response_target;
   let demoName       = req.headers.demo_name;
-
+  console.log( req );
   if ( ! target || '' === target || ! responseTarget || '' === responseTarget ) {
     console.log( 'Missing info' );
     res.status( 403 ).send( 'No domain passed on.' );
