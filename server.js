@@ -90,6 +90,6 @@ app.get( '/', async ( req, res ) => {
 // listen for requests :)
 let port = process.env.PORT;
 // let port = 64291;
-var listener = app.listen( port, function() {
+var listener = app.listen( 80, function() {
   console.log( 'Your app is listening on port ' + listener.address().port );
 } );
