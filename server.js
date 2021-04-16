@@ -13,8 +13,6 @@ const chromeLauncher = require( 'chrome-launcher' );
 const axios          = require( 'axios' );
 
 app.get( '/', async ( req, res ) => {
-  req.connection.setTimeout( 60 * 10 * 1000 );
-
   let target         = req.headers.referer;
   let responseTarget = req.headers.response_target;
   let demoName       = req.headers.demo_name;
@@ -87,7 +85,3 @@ let port = process.env.PORT;
 var listener = app.listen( port, function() {
   console.log( 'Your app is listening on port ' + listener.address().port );
 } );
-
-listener.on( 'connection', function( socket ) {
-    socket.setTimeout( 600 * 60 * 1000 );
-});
