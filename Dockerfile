@@ -1,55 +1,22 @@
-FROM browserless/base:1.9.0
+FROM gcr.io/google-appengine/nodejs
 
-# Build Args
-ARG USE_CHROME_STABLE
-ARG PUPPETEER_CHROMIUM_REVISION
-ARG PUPPETEER_VERSION
+# hadolint ignore=DL3009
+RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
+    ca-certificates \
+    apt-transport-https
 
-# Application parameters and variables
-ENV APP_DIR=/usr/src/app
-ENV CONNECTION_TIMEOUT=60000
-ENV CHROME_PATH=/usr/bin/google-chrome
-ENV HOST=0.0.0.0
-ENV IS_DOCKER=true
-ENV LANG="C.UTF-8"
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV PUPPETEER_CHROMIUM_REVISION=${PUPPETEER_CHROMIUM_REVISION}
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV USE_CHROME_STABLE=${USE_CHROME_STABLE}
-ENV WORKSPACE_DIR=$APP_DIR/workspace
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN mkdir -p $APP_DIR $WORKSPACE_DIR
-
-WORKDIR $APP_DIR
-
-# Install app dependencies
-COPY package.json .
-COPY tsconfig.json .
-COPY . .
-
-# Install Chrome Stable when specified
-RUN if [ "$USE_CHROME_STABLE" = "true" ]; then \
-    cd /tmp &&\
-    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&\
-    dpkg -i google-chrome-stable_current_amd64.deb;\
-  fi
-
-# Build and install external binaries + assets
-RUN if [ "$USE_CHROME_STABLE" = "true" ]; then \
-    export CHROMEDRIVER_SKIP_DOWNLOAD=false;\
-  else \
-    export CHROMEDRIVER_SKIP_DOWNLOAD=true;\
-  fi &&\
-  npm i puppeteer@$PUPPETEER_VERSION;\
-  npm run postinstall &&\
-  npm run build &&\
-  chown -R blessuser:blessuser $APP_DIR
-
-# Run everything after as non-privileged user.
-USER blessuser
-
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
+    google-chrome-stable \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+  
 # Expose the web-socket and HTTP ports
-EXPOSE 3000
+EXPOSE 8080
 
-CMD ["./start.sh"]
+ENV NODE_ENV=production
+RUN npm install --production
+CMD [ "npm", "start" ]
