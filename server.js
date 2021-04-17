@@ -33,7 +33,7 @@ app.get( '/', async ( req, res ) => {
   const options = {
     logLevel: 'info', 
     disableStorageReset: true,
-    maxWaitForLoad: 30000,
+    maxWaitForLoad: 60000,
     chromeFlags: chromeFlags,
     onlyAudits: [
       'first-contentful-paint',
