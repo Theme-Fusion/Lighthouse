@@ -25,14 +25,19 @@ app.get( '/', async ( req, res ) => {
     return;
   }
 
+  const chromeFlags = ['--headless', '--disable-dev-shm-usag', '--disable-gpu', '--disable-extensions', '--disable-popup-blocking', '--no-sandbox' ];
+
   res.send( 'Domain is being analysed.' );
   console.log( 'Returning request' );
   const chrome = await chromeLauncher.launch( { 
-    chromeFlags: ['--headless']
+    chromeFlags: chromeFlags
   } ).catch( error => { console.error( 'Chrome failed...', error ); } );
   console.log( 'Launched Chrome' );
   const options = {
     logLevel: 'info', 
+    disableStorageReset: true,
+    maxWaitForLoad: 10000,
+    chromeFlags: chromeFlags,
     onlyAudits: [
       'first-contentful-paint',
       'largest-contentful-paint',
