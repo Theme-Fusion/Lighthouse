@@ -16,23 +16,20 @@ app.get( '/', async ( req, res ) => {
   let target         = req.headers.referer;
   let responseTarget = req.query.response;
   let demoName       = req.query.demo;
-  console.log( target );
-  console.log( responseTarget );
-  console.log( demoName );
+
   if ( ! target || '' === target || ! responseTarget || '' === responseTarget ) {
-    console.log( 'Missing info' );
     res.status( 403 ).send( 'No domain passed on.' );
     return;
   }
 
-  const chromeFlags = ['--headless', '--disable-dev-shm-usag', '--disable-gpu', '--disable-extensions', '--disable-popup-blocking', '--no-sandbox' ];
+  const chromeFlags = ['--headless', '--disable-dev-shm-usag', '--disable-gpu', '--disable-extensions', '--disable-popup-blocking', '--no-sandbox', '--single-process' ];
 
   res.send( 'Domain is being analysed.' );
-  console.log( 'Returning request' );
+
   const chrome = await chromeLauncher.launch( { 
     chromeFlags: chromeFlags
   } ).catch( error => { console.error( 'Chrome failed...', error ); } );
-  console.log( 'Launched Chrome' );
+
   const options = {
     logLevel: 'info', 
     disableStorageReset: true,
@@ -59,9 +56,8 @@ app.get( '/', async ( req, res ) => {
     },
   };
 
-  console.log( 'Testing URL: ', target );
   const runnerResult = await lighthouse( target, options, config ).catch( error => { console.error( 'Lighthouse failed...', error ); } );
-  console.log( 'Got Results For URL' );
+
   let data = {
     fcp : {
       score: runnerResult.lhr.audits['first-contentful-paint'].score,
@@ -82,15 +78,16 @@ app.get( '/', async ( req, res ) => {
     score: runnerResult.lhr.categories.performance.score,
     demo_name: demoName,
   }
-  
+
   await chrome.kill();
 
-  console.log( 'Posting Back' );
   axios.post( responseTarget, data ).then( ( res ) => {
-    console.log( res )
+    return;
   } ).catch( ( error ) => {
     console.error( error )
   } );
+
+  return;
 } );
 
 // listen for requests :)
