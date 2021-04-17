@@ -82,14 +82,15 @@ app.get( '/', async ( req, res ) => {
     score: runnerResult.lhr.categories.performance.score,
     demo_name: demoName,
   }
+  
+  await chrome.kill();
+
   console.log( 'Posting Back' );
   axios.post( responseTarget, data ).then( ( res ) => {
     console.log( res )
   } ).catch( ( error ) => {
     console.error( error )
   } );
-
-  await chrome.kill();
 } );
 
 // listen for requests :)
