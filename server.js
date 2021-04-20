@@ -27,6 +27,7 @@ app.get( '/', async ( req, res ) => {
 
     res.send( 'Domain is being analysed.' );
 
+    console.log( 'Launching Browser' );
     const chrome = await puppeteer.launch( { args: ['--no-sandbox'] } ).catch( error => { console.error( 'Chrome failed...', error ); } );
 
     const options = {
@@ -40,7 +41,6 @@ app.get( '/', async ( req, res ) => {
         'max-potential-fid',
         'cumulative-layout-shift',
       ],
-      port: chrome.port
     };
 
     const config = {
@@ -55,6 +55,7 @@ app.get( '/', async ( req, res ) => {
       },
     };
 
+     console.log( 'Launching Lighthouse' );
     const runnerResult = await lighthouse( target, options, config ).catch( error => { console.error( 'Lighthouse failed...', error ); } );
 
     let data = {
@@ -78,9 +79,7 @@ app.get( '/', async ( req, res ) => {
       demo_name: demoName,
     }
 
-    await chrome.close();
-
-    await chrome.kill();
+    await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
 
     axios.post( responseTarget, data ).then( ( res ) => {
       return;
@@ -89,11 +88,11 @@ app.get( '/', async ( req, res ) => {
     } );
 
     return;
-  } catch (e) {
-    await chrome.close();
-    console.log(e);
+  } catch ( e ) {
+    await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
+    console.log( e );
   } finally {
-    await chrome.close();
+    await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
   }
 } );
 
