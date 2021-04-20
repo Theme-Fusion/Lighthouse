@@ -9,7 +9,7 @@ const express        = require( 'express' );
 var app              = express();
 const fs             = require( 'fs' );
 const lighthouse     = require( 'lighthouse' );
-const chromeLauncher = require( 'chrome-launcher' );
+const puppeteer      = require('puppeteer')
 const axios          = require( 'axios' );
 
 app.get( '/', async ( req, res ) => {
@@ -26,8 +26,13 @@ app.get( '/', async ( req, res ) => {
 
   res.send( 'Domain is being analysed.' );
 
-  const chrome = await chromeLauncher.launch( { 
-    chromeFlags: chromeFlags
+  const chrome = await puppeteer.launch( {
+    defaultViewport: {
+        width: 1920,
+        height: 1080,
+        isLandscape: true
+    },
+    args: chromeFlags
   } ).catch( error => { console.error( 'Chrome failed...', error ); } );
 
   const options = {
