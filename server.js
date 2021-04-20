@@ -41,6 +41,7 @@ app.get( '/', async ( req, res ) => {
         'max-potential-fid',
         'cumulative-layout-shift',
       ],
+      port: ( new URL( chrome.wsEndpoint() ) ).port,
     };
 
     const config = {
@@ -55,7 +56,7 @@ app.get( '/', async ( req, res ) => {
       },
     };
 
-     console.log( 'Launching Lighthouse' );
+    console.log( 'Launching Lighthouse' );
     const runnerResult = await lighthouse( target, options, config ).catch( error => { console.error( 'Lighthouse failed...', error ); } );
 
     let data = {
