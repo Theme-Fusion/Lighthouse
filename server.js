@@ -26,7 +26,7 @@ app.get( '/', async ( req, res ) => {
 
   res.send( 'Domain is being analysed.' );
 
-  const chrome = await puppeteer.launch().catch( error => { console.error( 'Chrome failed...', error ); } );
+  const chrome = await puppeteer.launch( { args: ['--no-sandbox'] } ).catch( error => { console.error( 'Chrome failed...', error ); } );
 
   const options = {
     logLevel: 'info', 
