@@ -90,10 +90,14 @@ app.get( '/', async ( req, res ) => {
 
     return;
   } catch ( e ) {
-    await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
+     if ( 'undefined' !== typeof  chrome ) {
+      await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
+    }
     console.log( e );
   } finally {
-    await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
+    if ( 'undefined' !== typeof  chrome ) {
+      await chrome.close().catch( error => { console.error( 'Closing chrome failed...', error ); } );
+    }
   }
 } );
 
