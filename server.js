@@ -26,14 +26,7 @@ app.get( '/', async ( req, res ) => {
 
   res.send( 'Domain is being analysed.' );
 
-  const chrome = await puppeteer.launch( {
-    defaultViewport: {
-        width: 1920,
-        height: 1080,
-        isLandscape: true
-    },
-    args: chromeFlags
-  } ).catch( error => { console.error( 'Chrome failed...', error ); } );
+  const chrome = await puppeteer.launch().catch( error => { console.error( 'Chrome failed...', error ); } );
 
   const options = {
     logLevel: 'info', 
@@ -83,6 +76,8 @@ app.get( '/', async ( req, res ) => {
     score: runnerResult.lhr.categories.performance.score,
     demo_name: demoName,
   }
+
+  await chrome.close();
 
   await chrome.kill();
 
